@@ -47,3 +47,4 @@ zope.interface==6.4.post2
 flask
 requests==2.25.1
 nordvpn-connect==0.0.8
+openvpn-api==0.3.13
