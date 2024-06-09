@@ -12,9 +12,9 @@ import logging
 from openvpn_api import Client
 
 # Informasi koneksi OpenVPN
-OPENVPN_CONFIG_FILE = "path/to/your/openvpn/config/file.ovpn"
-OPENVPN_USERNAME = "your_openvpn_username"
-OPENVPN_PASSWORD = "your_openvpn_password"
+OPENVPN_CONFIG_FILE = "id55.nordvpn.com.tcp443.ovpn"
+OPENVPN_USERNAME = "E9tSBouogzowBerdbjNXro6Q"
+OPENVPN_PASSWORD = "dPuaD56A7PBGQAmD77t9vBXM"
 
 # Fungsi untuk menghubungkan ke VPN menggunakan OpenVPN
 def connect_to_vpn():
