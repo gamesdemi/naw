@@ -11,6 +11,9 @@ import certifi
 import logging
 from openvpn_api import Client
 
+# Token Bot Telegram
+TOKEN = "6845337341:AAEElZtlJI8-F-GBccePGhrroS4Fc_Y8CbI"
+
 # Informasi koneksi OpenVPN
 OPENVPN_CONFIG_FILE = "id55.nordvpn.com.tcp443.ovpn"
 OPENVPN_USERNAME = "E9tSBouogzowBerdbjNXro6Q"
