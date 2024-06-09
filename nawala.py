@@ -9,7 +9,6 @@ import schedule
 import time
 import certifi
 import logging
-from nordvpn_connect import initialize_VPN, connect_VPN, disconnect_VPN
 
 # Ambil nilai variabel lingkungan untuk nama pengguna dan kata sandi NordVPN
 nordvpn_username = os.environ.get('NORDVPN_USERNAME')
@@ -17,19 +16,6 @@ nordvpn_password = os.environ.get('NORDVPN_PASSWORD')
 
 # Token bot Telegram
 TOKEN = "6845337341:AAEElZtlJI8-F-GBccePGhrroS4Fc_Y8CbI"
-
-# Fungsi untuk menghubungkan ke VPN NordVPN
-def connect_to_vpn():
-    # Inisialisasi VPN
-    initialize_VPN()
-
-    # Hubungkan ke server NordVPN yang berlokasi di Indonesia
-    connect_VPN('Indonesia')
-
-# Fungsi untuk memutuskan koneksi VPN NordVPN
-def disconnect_from_vpn():
-    # Putuskan koneksi VPN
-    disconnect_VPN()
 
 # Fungsi untuk memeriksa status blokir di TrustPositif
 def check_trustpositif(domain):
@@ -124,9 +110,6 @@ def main():
     logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
     logger = logging.getLogger(__name__)
 
-    # Connect to NordVPN
-    connect_to_vpn()
-
     # Inisialisasi updater
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
@@ -145,10 +128,6 @@ def main():
     job_queue.run_repeating(check_and_notify, interval=300, first=0, context='-4220207549')
 
     logger.info("Bot is running. Press Ctrl+C to stop.")
-    updater.idle()
-
-    # Disconnect from NordVPN when bot is stopped
-    disconnect_from_vpn()
 
 if __name__ == '__main__':
     main()
