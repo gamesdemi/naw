@@ -1,65 +1,54 @@
 import os
 import requests
-from bs4 import BeautifulSoup
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext
-from google.oauth2 import service_account
-from googleapiclient.discovery import build
-import schedule
-import time
-import certifi
-import logging
-from openvpn_api import Client
 
 # Token Bot Telegram
 TOKEN = "6845337341:AAEElZtlJI8-F-GBccePGhrroS4Fc_Y8CbI"
 
-# Informasi koneksi OpenVPN
-OPENVPN_CONFIG_FILE = "id55.nordvpn.com.tcp443.ovpn"
-OPENVPN_USERNAME = "E9tSBouogzowBerdbjNXro6Q"
-OPENVPN_PASSWORD = "dPuaD56A7PBGQAmD77t9vBXM"
+# Fungsi untuk mengecek apakah situs web diblokir di Indonesia
+def check_website(update: Update, context: CallbackContext):
+    # Mendapatkan argumen yang dikirim oleh pengguna
+    website = context.args[0]
+    
+    # URL untuk memeriksa blokir website menggunakan API Nawala
+    url = f"https://apinawala.heryad.es/api/?action=check&url={website}"
+    
+    # Mengirim permintaan GET ke API Nawala
+    response = requests.get(url)
+    
+    # Mengecek status kode HTTP
+    if response.status_code == 200:
+        result = response.json()
+        if result["success"]:
+            if result["blocked"]:
+                message = f"Situs {website} diblokir di Indonesia."
+            else:
+                message = f"Situs {website} tidak diblokir di Indonesia."
+        else:
+            message = "Terjadi kesalahan dalam memeriksa situs web."
+    else:
+        message = "Gagal memeriksa situs web. Mohon coba lagi."
+    
+    # Mengirim balasan ke pengguna
+    update.message.reply_text(message)
 
-# Fungsi untuk menghubungkan ke VPN menggunakan OpenVPN
-def connect_to_vpn():
-    client = Client("localhost", port=1337)  # Sesuaikan dengan port OpenVPN API
-    client.connect(OPENVPN_CONFIG_FILE)
-    client.login(OPENVPN_USERNAME, OPENVPN_PASSWORD)
+# Fungsi untuk menampilkan pesan bantuan
+def help_command(update: Update, context: CallbackContext):
+    update.message.reply_text("Gunakan perintah /checkwebsite <nama_situs> untuk memeriksa apakah suatu situs web diblokir di Indonesia.")
 
-# Fungsi untuk memutuskan koneksi VPN
-def disconnect_from_vpn():
-    client = Client("localhost", port=1337)  # Sesuaikan dengan port OpenVPN API
-    client.disconnect()
-
-# Fungsi utama untuk menjalankan bot
 def main():
-    logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-    logger = logging.getLogger(__name__)
-
-    # Connect to VPN
-    connect_to_vpn()
-
     # Inisialisasi updater
     updater = Updater(TOKEN)
     dispatcher = updater.dispatcher
 
-    # Add command handlers
-    dispatcher.add_handler(CommandHandler("start", start))
-    dispatcher.add_handler(CommandHandler("cek", cek))
-    dispatcher.add_handler(CommandHandler("ceksemua", check_and_notify))
-    dispatcher.add_handler(CommandHandler("getchatid", get_chat_id))
+    # Menambahkan command handler
+    dispatcher.add_handler(CommandHandler("checkwebsite", check_website))
+    dispatcher.add_handler(CommandHandler("help", help_command))
 
-    logger.info("Starting the bot...")
+    # Memulai bot
     updater.start_polling()
-
-    # Schedule checking every 5 minutes
-    job_queue = updater.job_queue
-    job_queue.run_repeating(check_and_notify, interval=300, first=0, context='-4220207549')
-
-    logger.info("Bot is running. Press Ctrl+C to stop.")
     updater.idle()
-
-    # Disconnect from VPN when bot is stopped
-    disconnect_from_vpn()
 
 if __name__ == '__main__':
     main()
